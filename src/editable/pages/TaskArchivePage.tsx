@@ -80,7 +80,7 @@ const taskGrid: Record<TaskKey, string> = {
 }
 
 // Shared premium surface: hairline border, soft radius, smooth lift on hover.
-const cardBase = 'group block rounded-[var(--tk-radius)] border border-[var(--tk-line)] bg-[var(--tk-surface)] transition duration-500 hover:-translate-y-1.5 hover:shadow-[0_32px_72px_rgba(15,23,42,0.14)]'
+const cardBase = 'group block rounded-[var(--tk-radius)] border border-[var(--tk-line)] bg-[var(--tk-surface)] shadow-[0_2px_10px_rgba(94,0,6,0.05)] transition duration-500 hover:-translate-y-1.5 hover:shadow-[0_26px_58px_rgba(94,0,6,0.16)]'
 
 export async function EditableTaskArchiveRoute({
   task,
@@ -110,9 +110,9 @@ export function TaskArchiveView({ task, posts, pagination, category, basePath }:
   return (
     <EditableSiteShell>
       <main style={taskThemeStyle(task)} className="min-h-screen bg-[var(--tk-bg)] text-[var(--tk-text)]">
-        <header className="relative overflow-hidden border-b border-[var(--tk-line)]">
+        <header className="relative overflow-hidden border-b border-[var(--tk-line)] bg-[var(--tk-raised)]">
           <div className="pointer-events-none absolute inset-x-0 -top-40 h-96 bg-[radial-gradient(60%_60%_at_50%_0%,var(--tk-glow),transparent_70%)]" />
-          <div className="relative mx-auto max-w-[var(--editable-container)] px-6 py-20 sm:py-28 lg:px-8">
+          <div className="relative mx-auto max-w-[var(--editable-container)] px-6 py-16 sm:py-24 lg:px-8">
             <div className="flex items-center gap-3 text-[11px] font-medium uppercase tracking-[0.34em] text-[var(--tk-accent)]">
               <span>{theme.kicker}</span>
               <span className="h-1 w-1 rounded-full bg-[var(--tk-accent)] opacity-50" />
@@ -281,21 +281,29 @@ function ListingArchiveCard({ post, href }: { post: SitePost; href: string }) {
 }
 
 function ClassifiedArchiveCard({ post, href }: { post: SitePost; href: string }) {
+  const image = getImage(post)
   const price = getField(post, ['price', 'amount', 'budget'])
   const location = getField(post, ['location', 'address', 'city'])
   const condition = getField(post, ['condition', 'type', 'availability'])
+  const category = getCategory(post, 'Classified')
   return (
-    <Link href={href} className={`${cardBase} flex flex-col p-6 sm:p-7`}>
-      <div className="flex items-start justify-between gap-4">
-        <span className="editable-display text-3xl font-semibold tracking-[-0.03em] text-[var(--tk-accent)]">{price || 'Open offer'}</span>
-        {condition ? <span className="rounded-full bg-[var(--tk-accent-soft)] px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-[var(--tk-accent)]">{condition}</span> : null}
+    <Link href={href} className={`${cardBase} flex flex-col overflow-hidden`}>
+      <div className="relative aspect-[16/11] overflow-hidden bg-[var(--tk-raised)]">
+        <img src={image} alt="" className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.05]" />
+        <div className="absolute left-3 top-3 flex gap-2">
+          <span className="rounded-full bg-[var(--tk-accent)] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--tk-on-accent)]">{category}</span>
+          {condition ? <span className="rounded-full bg-[var(--slot4-accent-deep)]/90 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.08em] text-white backdrop-blur-sm">{condition}</span> : null}
+        </div>
       </div>
-      <h2 className="editable-display mt-5 text-xl font-semibold leading-snug tracking-[-0.02em]">{post.title}</h2>
-      <RatingLine post={post} />
-      <p className="mt-3 line-clamp-3 flex-1 text-sm leading-7 text-[var(--tk-muted)]">{getSummary(post)}</p>
-      <div className="mt-6 flex items-center justify-between border-t border-[var(--tk-line)] pt-4 text-xs font-medium text-[var(--tk-muted)]">
-        <span className="inline-flex items-center gap-1.5">{location ? <><MapPin className="h-3.5 w-3.5" /> {location}</> : 'Details inside'}</span>
-        <ArrowUpRight className="h-4 w-4 text-[var(--tk-accent)] transition group-hover:translate-x-0.5" />
+      <div className="flex flex-1 flex-col p-5 sm:p-6">
+        <h2 className="editable-display line-clamp-1 text-xl font-bold tracking-[-0.02em]">{post.title}</h2>
+        {location ? <p className="mt-1.5 inline-flex items-center gap-1.5 text-sm text-[var(--tk-muted)]"><MapPin className="h-4 w-4 text-[var(--tk-accent)]" /> {location}</p> : null}
+        <RatingLine post={post} />
+        <p className="mt-2 line-clamp-2 flex-1 text-sm leading-6 text-[var(--tk-muted)]">{getSummary(post)}</p>
+        <div className="mt-5 flex items-center justify-between border-t border-[var(--tk-line)] pt-4">
+          <span className="editable-display text-xl font-bold text-[var(--tk-accent)]">{price || 'View post'}</span>
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--tk-line)] px-4 py-2 text-sm font-bold transition group-hover:border-[var(--tk-accent)] group-hover:text-[var(--tk-accent)]">Details <ArrowUpRight className="h-4 w-4" /></span>
+        </div>
       </div>
     </Link>
   )
